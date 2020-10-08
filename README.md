@@ -8,6 +8,7 @@ GpsTracker 어플에 대한 설명
 3. MainActivity 얻어온 위치값 toast메세지로 띄우기
 
 *어플에 퍼미션 추가
+============
 
 먼저 manifest파일에 추가할 퍼미션을 먼저 적어놓습니다.
 1. android.permission.ACCESS_COARSE_LOCATION - API에서 WiFi 또는 모바일 데이터(또는 둘 다)를 사용하여 기기의 위치를 결정할 수 있습니다. API에서는 정확도가 도시 블록 1개 정도의 오차 수준으로 위치를 반환합니다.
@@ -162,3 +163,119 @@ if문을 사용하여 사용자가 퍼미션을 허용했는지 거부했는지�
 
     }
 ```
+
+*GpsTracker 클래스에 대하여
+=========
+
+````
+public class GpsTracker extends Service implements LocationListener {
+
+    private final Context mContext;
+    Location location;
+    double latitude;
+    double longitude;
+
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+    protected LocationManager locationManager;
+
+
+    public GpsTracker(Context context) {
+        this.mContext = context;
+        getLocation();
+    }
+
+
+    public Location getLocation() {
+        try {
+            locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+
+            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+            if (!isGPSEnabled && !isNetworkEnabled) {
+
+            } else {
+
+                int hasFineLocationPermission = ContextCompat.checkSelfPermission(mContext,
+                        Manifest.permission.ACCESS_FINE_LOCATION);
+                int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(mContext,
+                        Manifest.permission.ACCESS_COARSE_LOCATION);
+
+
+                if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
+                        hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+
+                    
+                } else
+                    return null;
+
+
+                if (isNetworkEnabled) {
+
+
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                    if (locationManager != null)
+                    {
+                        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        if (location != null)
+                        {
+                            latitude = location.getLatitude();
+                            longitude = location.getLongitude();
+                        }
+                    }
+                }
+
+
+                if (isGPSEnabled)
+                {
+                    if (location == null)
+                    {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        if (locationManager != null)
+                        {
+                            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                            if (location != null)
+                            {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log.d("@@@", ""+e.toString());
+        }
+
+        return location;
+    }
+     public double getLatitude()
+    {
+        if(location != null)
+        {
+            latitude = location.getLatitude();
+        }
+
+        return latitude;
+    }
+
+    public double getLongitude()
+    {
+        if(location != null)
+        {
+            longitude = location.getLongitude();
+        }
+
+        return longitude;
+    }
+
+````
+isGPSEnabled와 isNetworkEnabled변수에 받아온 gps퍼미션과,network퍼미션을 집어넣습니다 퍼미션이 들어간게 확인되면 context내장함수를 사용해 
+hasFineLocationPermission과 hasCoarseLocationPermission을 사용해 다시한번 퍼미션이 제대로 들어갔는지 확인합니다
+들어간게 확인되면 getLatitude(),getLongitude()를 사용하여 latitude 변수와 longitude변수에 위치정보값을 대입합니다 각각 위도랑 경도를 구하는 내장 메소드입니다.
+
+
