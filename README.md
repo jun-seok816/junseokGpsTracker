@@ -278,4 +278,196 @@ isGPSEnabled와 isNetworkEnabled변수에 받아온 gps퍼미션과,network퍼�
 hasFineLocationPermission과 hasCoarseLocationPermission을 사용해 다시한번 퍼미션이 제대로 들어갔는지 확인합니다
 들어간게 확인되면 getLatitude(),getLongitude()를 사용하여 latitude 변수와 longitude변수에 위치정보값을 대입합니다 각각 위도랑 경도를 구하는 내장 메소드입니다.
 
+*MainActivity 얻어온 위치값 toast메세지로 띄우기
+=======
+
+getCurrentAddress()메소드를 사용해 위도랑 경도를 받아옵니다 위도랑 경도가 null값이거나 이상한값이면 잘못된Gps좌표를 출력합니다.
+
+```
+public String getCurrentAddress( double latitude, double longitude) {
+
+
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+        List<Address> addresses;
+
+        try {
+
+            addresses = geocoder.getFromLocation(
+                    latitude,
+                    longitude,
+                    7);
+        } catch (IOException ioException) {
+
+            Toast.makeText(this, "서비스 사용불가", Toast.LENGTH_LONG).show();
+            return " 서비스 사용불가";
+        } catch (IllegalArgumentException illegalArgumentException) {
+            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
+            return "잘못된 GPS 좌표";
+
+        }
+
+
+
+        if (addresses == null || addresses.size() == 0) {
+            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
+            return "주소 미발견";
+
+        }
+
+        Address address = addresses.get(0);
+        return address.getAddressLine(0).toString()+"\n";
+
+    }
+```
+마지막의로 onCreate메소드 
+```
+ protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+
+        if (!checkLocationServicesStatus()) {
+
+            showDialogForLocationServiceSetting();
+        }else {
+
+            checkRunTimePermission();
+        }
+
+        final TextView textview_address = (TextView)findViewById(R.id.textview);
+
+
+        Button ShowLocationButton = (Button) findViewById(R.id.button);
+        ShowLocationButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View arg0)
+            {
+
+                gpsTracker = new GpsTracker(MainActivity.this);
+
+                double latitude = gpsTracker.getLatitude();
+                double longitude = gpsTracker.getLongitude();
+
+                String address = getCurrentAddress(latitude, longitude);
+                textview_address.setText(address);
+
+                Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+````
+
+앱이 실행되자마자 권한체크를 합니다
+
+```
+ if (!checkLocationServicesStatus()) {
+
+            showDialogForLocationServiceSetting();
+        }else {
+
+            checkRunTimePermission();
+        }
+```
+권한이 꺼져있으면 
+
+```
+private void showDialogForLocationServiceSetting() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("위치 서비스 비활성화");
+        builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n"
+                + "위치 설정을 수정하실래요?");
+        builder.setCancelable(true);
+        builder.setPositiveButton("설정", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                Intent callGPSSettingIntent
+                        = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivityForResult(callGPSSettingIntent, GPS_ENABLE_REQUEST_CODE);
+            }
+        });
+        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        builder.create().show();
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+
+            case GPS_ENABLE_REQUEST_CODE:
+
+
+                if (checkLocationServicesStatus()) {
+                    if (checkLocationServicesStatus()) {
+
+                        Log.d("@@@", "onActivityResult : GPS 활성화 되있음");
+                        checkRunTimePermission();
+                        return;
+                    }
+                }
+
+                break;
+        }
+    }
+
+```
+showDialogForLocationServiceSetting()메소드를 호출하여 다시 사용자에게 권한요청을 합니다 권한요청을 수락하면 startActivityForResult()내장 메소드를 실행해 onActivityResult를 실행시킵니다 onActivityResult메소드는  switch문을 이용해 checkRunTimePermission()메소드를 호출합니다
+
+마지막으로 
+```
+Button ShowLocationButton = (Button) findViewById(R.id.button);
+        ShowLocationButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View arg0)
+            {
+
+                gpsTracker = new GpsTracker(MainActivity.this);
+
+                double latitude = gpsTracker.getLatitude();
+                double longitude = gpsTracker.getLongitude();
+
+                String address = getCurrentAddress(latitude, longitude);
+                textview_address.setText(address);
+
+                Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+            }
+        });
+```
+activity_main.xml에 띄워놓은 버튼을 클릭하면 gpsTracker클래스에서 가져온 위도랑 경도값을 Toast메세지를 띄우고 끝
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
