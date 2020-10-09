@@ -355,5 +355,169 @@ public void onRequestPermissionsResult(int permsRequestCode,
 코드가 정상적이면 퍼미션이 허용된게 확인되며 앱이 정상적으로 실행됩니다.
 
 
+GpsTracker
+====
 
+```
+public class GpsTracker extends Service implements LocationListener {
+
+    private final Context mContext;
+    Location location;
+    double latitude;
+    double longitude;
+
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+    protected LocationManager locationManager;
+
+
+    public GpsTracker(Context context) {
+        this.mContext = context;
+        getLocation();
+    }
+
+
+    public Location getLocation() {
+        try {
+            locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+
+            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+            if (!isGPSEnabled && !isNetworkEnabled) {
+
+            } else {
+
+                int hasFineLocationPermission = ContextCompat.checkSelfPermission(mContext,
+                        Manifest.permission.ACCESS_FINE_LOCATION);
+                int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(mContext,
+                        Manifest.permission.ACCESS_COARSE_LOCATION);
+
+
+                if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
+                        hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+
+
+                } else
+                    return null;
+
+
+                if (isNetworkEnabled) {
+
+
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                    if (locationManager != null)
+                    {
+                        location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        if (location != null)
+                        {
+                            latitude = location.getLatitude();
+                            longitude = location.getLongitude();
+                        }
+                    }
+                }
+
+
+                if (isGPSEnabled)
+                {
+                    if (location == null)
+                    {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        if (locationManager != null)
+                        {
+                            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                            if (location != null)
+                            {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log.d("@@@", ""+e.toString());
+        }
+
+        return location;
+    }
+
+    public double getLatitude()
+    {
+        if(location != null)
+        {
+            latitude = location.getLatitude();
+        }
+
+        return latitude;
+    }
+
+    public double getLongitude()
+    {
+        if(location != null)
+        {
+            longitude = location.getLongitude();
+        }
+
+        return longitude;
+    }
+```    
+GpsTracker라는 서브클래스를 만들어 getLocation 함수를 사용하여 try-catch문을 사용해 예외처리를 똑같이 locationManager 인스턴스에 getSystemService()를 이용해 시스템 서비스를 가져옵니다.
+마지막으로 메소드가 종료되기전에 (GPS : LocationManager.GPS_PROVIDER /전화기지국 : LocationManager.NETWORK_PROVIDER) 을 리턴해줍니다.
+
+만약에 시스템서비스를 가져올 수 없으면 퍼미션체크를 해주고 퍼미션이 거부되어있는 상태이면 null값을 리턴합니다
+만약에 시스템서비스를 가져올 수 있으면 latitude = location.getLatitude(); longitude = location.getLongitude();를 사용하여 변수에 위도랑 경도를 초기화 시킵니다.
+
+```
+ public double getLatitude()
+    {
+        if(location != null)
+        {
+            latitude = location.getLatitude();
+        }
+
+        return latitude;
+    }
+
+    public double getLongitude()
+    {
+        if(location != null)
+        {
+            longitude = location.getLongitude();
+        }
+
+        return longitude;
+    }
+```
+위도랑 경도를 불러오는 함수
+
+마지막으로 
+
+```
+       Button ShowLocationButton = (Button) findViewById(R.id.button);
+        ShowLocationButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View arg0)
+            {
+
+                gpsTracker = new GpsTracker(MainActivity.this);
+
+                double latitude = gpsTracker.getLatitude();
+                double longitude = gpsTracker.getLongitude();
+
+                String address = getCurrentAddress(latitude, longitude);
+                textview_address.setText(address);
+
+                Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+                         
+```
+
+만들어둔 버튼에 온클릭처리를 하여 Toast메세지로 위도랑 경도를 띄우고 끝 
 
