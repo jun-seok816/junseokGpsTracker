@@ -32,7 +32,9 @@ GpsTracker 어플에 대한 설명
    
    
 ```
-*checkRunTimePermission()함수에서  requsetPermissions()함수를 이용해 사용자에게 시스템 권한요청을 합니다.
+*checkRunTimePermission()함수에서  ContextCompat.checkSelfPermission() 메서드에 권한을 전달합니다. 이 메서드는 앱에 권한이 있는지에 따라 PERMISSION_GRANTED 또는 PERMISSION_DENIED를 반환합니다.
+ContextCompat.checkSelfPermission() 메서드가 PERMISSION_DENIED를 반환하면 shouldShowRequestPermissionRationale()을 호출합니다. 이 메서드가 true를 반환하면 교육용 UI를 사용자에게 표시합니다. 이 UI에서 사용자가 사용 설정하려는 기능에 특정 권한이 필요한 이유를 설명합니다.
+
 
 ```
  void checkRunTimePermission(){
@@ -76,7 +78,7 @@ GpsTracker 어플에 대한 설명
 
 *onRequestPermissionResult함수
 사용자가 시스템 권한 대화상자에 응답하면 시스템은 앱의 onRequestPermissionResult()구현을 호출합니다.
-onRequestPermissionResult함수에서 사용자의 권한 거부 처리를 합시다.
+onRequestPermissionResult함수에서 사용자의 권한 거부, 처리를 합시다.
 ```
  @Override
     public void onRequestPermissionsResult(int permsRequestCode,
@@ -122,47 +124,7 @@ onRequestPermissionResult함수에서 사용자의 권한 거부 처리를 합�
     }
     
 ```
-if문을 사용하여 사용자가 퍼미션을 허용했는지 거부했는지에 대한 결과값을 얻어옵니다.
-*ContextCompat.checkSelfPermission()메서드에 권한을 전달하면 메서드가 앱이 권한이 있는지에 따라 PERMISSION_GRANTED 또는 PERMISSION_DENIED를 반환합니다.
 
-```
- void checkRunTimePermission(){
-
-
-        int hasFineLocationPermission = ContextCompat.checkSelfPermission(MainActivity.this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
-        int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(MainActivity.this,
-                Manifest.permission.ACCESS_COARSE_LOCATION);
-
-
-        if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
-                hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
-
-
-
-
-        } else {
-
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, REQUIRED_PERMISSIONS[0])) {
-
-
-                Toast.makeText(MainActivity.this, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.", Toast.LENGTH_LONG).show();
-
-                ActivityCompat.requestPermissions(MainActivity.this, REQUIRED_PERMISSIONS,
-                        PERMISSIONS_REQUEST_CODE);
-
-
-            } else {
-
-                ActivityCompat.requestPermissions(MainActivity.this, REQUIRED_PERMISSIONS,
-                        PERMISSIONS_REQUEST_CODE);
-            }
-
-        }
-
-    }
-```
 
 *GpsTracker 클래스에 대하여
 =========
