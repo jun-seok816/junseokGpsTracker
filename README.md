@@ -271,9 +271,10 @@ showDialogForLocationServiceSetting()메소드는 사용자에게 대화박스�
 사용자가 허용을 누르면 onActivityResult()메소드를[startActivityForResult()는 강제로onActivityResult()메소드를 호출함],  호출하여 checkRunTimePermission()를 호출합니다.
 
 ```
-void checkRunTimePermission(){
+void checkRunTimePermission() {
 
-
+        //런타임 퍼미션 처리
+        // 1. 위치 퍼미션을 가지고 있는지 체크합니다.
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
         int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(MainActivity.this,
@@ -283,32 +284,77 @@ void checkRunTimePermission(){
         if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
                 hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
 
+            // 2. 이미 퍼미션을 가지고 있다면
+            // ( 안드로이드 6.0 이하 버전은 런타임 퍼미션이 필요없기 때문에 이미 허용된 걸로 인식합니다.)
 
 
+            // 3.  위치 값을 가져올 수 있음
 
-        } else {
 
+        } else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
 
+            // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, REQUIRED_PERMISSIONS[0])) {
 
-
+                // 3-2. 요청을 진행하기 전에 사용자가에게 퍼미션이 필요한 이유를 설명해줄 필요가 있습니다.
                 Toast.makeText(MainActivity.this, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.", Toast.LENGTH_LONG).show();
-
+                // 3-3. 사용자게에 퍼미션 요청을 합니다. 요청 결과는 onRequestPermissionResult에서 수신됩니다.
                 ActivityCompat.requestPermissions(MainActivity.this, REQUIRED_PERMISSIONS,
                         PERMISSIONS_REQUEST_CODE);
 
 
             } else {
-
+                // 4-1. 사용자가 퍼미션 거부를 한 적이 없는 경우에는 퍼미션 요청을 바로 합니다.
+                // 요청 결과는 onRequestPermissionResult에서 수신됩니다.
                 ActivityCompat.requestPermissions(MainActivity.this, REQUIRED_PERMISSIONS,
                         PERMISSIONS_REQUEST_CODE);
             }
 
         }
+    }
 ```      
 ContextCompat.checkSelfPermission()를 사용해  사용자가 이미 앱에 특정 권한을 부여했는지 확인합니다 이 메소드는 PERMISSION_GRANTED 또는 PERMISSION_DENIED를 반환합니다. 만약에 ContextCompat.checkSelfPermission() 메서드가 PERMISSION_DENIED를 반환하면 shouldShowRequestPermissionRationale()을 호출, if문을 사용하여 사용자에게 다시한번 퍼미션을 요구하고, requestPermissions()메소드에 요청코드를 포함시켜 시스템이 권한요청 코드를 관리하도록 허용시킵니다.
 
-사용자가 시스템 권한 대화상자에 응답하면 시스템은 앱의 onRequestPermissionsResult() 구현을 호출합니다. 시스템은 사용자 응답을 권한 대화상자에 전달하고 개발자가 정의한 요청 코드를 전달합니다. 
+사용자가 시스템 권한 대화상자에 응답하면 시스템은 앱의 onRequestPermissionsResult() 구현을 호출합니다. 시스템은 사용자 응답을 권한 대화상자에 전달하고 개발자가 정의한 요청 코드를 전달합니다.  요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면
+
+모든 퍼미션을 허용했는지 체크합니다.
+```
+for (int result : grandResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    check_result = false;
+                    break;
+                }
+            }
+```
+위치 값을 가져올 수 있음
+
+```
+ if (check_result) {
+
+                //위치 값을 가져올 수 있음
+                ;
+            }
+```
+거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다. 2가지 경우가 있음
+
+```
+ else {
+                
+
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])
+                        || ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1])) {
+
+                    Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 앱을 다시 실행하여 퍼미션을 허용해주세요.", Toast.LENGTH_LONG).show();
+                    finish();
+
+
+                } else {
+
+                    Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 설정(앱 정보)에서 퍼미션을 허용해야 합니다. ", Toast.LENGTH_LONG).show();
+
+                }
+            }
+```
 
 ```
 public void onRequestPermissionsResult(int permsRequestCode,
