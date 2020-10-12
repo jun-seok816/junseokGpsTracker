@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity
 }
 ```
 
-앱이 실행되면 onCreate메소드에서 if문을 사용하여 checkLocationServicesStatus()메소드를 호출합니다 
+앱이 실행되면 onCreate메소드에서 if문을 사용하여 checkLocationServicesStatus()메소드를 파라미터로 받습니다.
 
 ```
  public boolean checkLocationServicesStatus() {
@@ -236,8 +236,10 @@ public class MainActivity extends AppCompatActivity
     }
 ```   
 
-이 메소드는 locationManager 인스턴스에 getSystemService()를 이용해 시스템 서비스를 가져옵니다.
-마지막으로 메소드가 종료되기전에 (GPS : LocationManager.GPS_PROVIDER /전화기지국 : LocationManager.NETWORK_PROVIDER) 을 리턴해줍니다.
+이 메소드는 locationManager 변수에 getSystemService()를 이용해 시스템 서비스를 가져옵니다.
+마지막으로 메소드가 종료되기전에 (GPS : LocationManager.GPS_PROVIDER /전화기지국 : LocationManager.NETWORK_PROVIDER)
+GPS 프로바이더 사용가능여부 true,네트워크 프로바이더 사용가능여부 true
+을 리턴해줍니다.
 
 if(!checkLocationServiecesStatus())에서 checkLocationServicesStatus()가 값이 없으면 showDialogForLocationServiceSetting()을 호출하여
 사용자에게 위치서비스를 요구합니다.
@@ -268,7 +270,33 @@ private void showDialogForLocationServiceSetting() {
     }
 ```
 showDialogForLocationServiceSetting()메소드는 사용자에게 대화박스를 이용하여 위치서비스를 요구합니다,
-사용자가 허용을 누르면 onActivityResult()메소드를[startActivityForResult()는 강제로onActivityResult()메소드를 호출함],  호출하여 checkRunTimePermission()를 호출합니다.
+사용자가 허용을 누르면 //[액티비티가 완료되었을 때 결과를 수신하려면, startActivityForResult()를 호출합니다. 액티비티는 해당 결과를 이 액티비티의 onActivityResult() 콜백에서 별도의 Intent 객체로 수신합니다.]// Intent 객체 callGPSSettingIntent에"ACTION_LOCATION_SOURCE_SETTINGS" 을 파라미터로 넣습니다 ACTION_LOCATION_SOURCE_SETTINGS란 현재 위치 소스 구성을 허용하는 설정창을 표시합니다. startActivityForResult()메소드에 인텐트 객체랑 GPS코드를 파라미터로 넘깁니다.
+
+
+````
+ @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+
+            case GPS_ENABLE_REQUEST_CODE:
+
+
+                if (checkLocationServicesStatus()) {
+                    if (checkLocationServicesStatus()) {
+
+                        Log.d("@@@", "onActivityResult : GPS 활성화 되있음");
+                        checkRunTimePermission();
+                        return;
+                    }
+                }
+
+                break;
+        }
+    }
+````
+onActivityResult메소드에서 GPS_ENABLE_REQUEST_CODE: 가 넘겨받은 requestCode랑 일치하면 GPS 프로바이더 사용가능여부,네트워크 프로바이더 사용가능여부 를 확인하고  checkRunTimePermission()을 호출합니다.
 
 ```
 void checkRunTimePermission() {
@@ -294,7 +322,7 @@ void checkRunTimePermission() {
         } else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
 
             // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, REQUIRED_PERMISSIONS[0])) {
+            if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,shouldShowRequestPermissionRationale(MainActivity.this, REQUIRED_PERMISSIONS[0]))) {
 
                 // 3-2. 요청을 진행하기 전에 사용자가에게 퍼미션이 필요한 이유를 설명해줄 필요가 있습니다.
                 Toast.makeText(MainActivity.this, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.", Toast.LENGTH_LONG).show();
@@ -313,48 +341,11 @@ void checkRunTimePermission() {
         }
     }
 ```      
-ContextCompat.checkSelfPermission()를 사용해  사용자가 이미 앱에 특정 권한을 부여했는지 확인합니다 이 메소드는 PERMISSION_GRANTED 또는 PERMISSION_DENIED를 반환합니다. 만약에 ContextCompat.checkSelfPermission() 메서드가 PERMISSION_DENIED를 반환하면 shouldShowRequestPermissionRationale()을 호출, if문을 사용하여 사용자에게 다시한번 퍼미션을 요구하고, requestPermissions()메소드에 요청코드를 포함시켜 시스템이 권한요청 코드를 관리하도록 허용시킵니다.
+ContextCompat.checkSelfPermission()를 사용해  사용자가 이미 앱에 특정 권한을 부여했는지 확인합니다 이 메소드는 PERMISSION_GRANTED 또는 PERMISSION_DENIED를 반환합니다. 만약에 ContextCompat.checkSelfPermission() 메서드가 PERMISSION_DENIED를 반환하면 shouldShowRequestPermissionRationale()을 호출, if문을 사용하여 사용자에게 다시한번 퍼미션을 요구하고, requestPermissions()메소드에 요청코드를 포함시켜 사용자에게 퍼미션을 요청합니다.
 
 사용자가 시스템 권한 대화상자에 응답하면 시스템은 앱의 onRequestPermissionsResult() 구현을 호출합니다. 시스템은 사용자 응답을 권한 대화상자에 전달하고 개발자가 정의한 요청 코드를 전달합니다.  요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면
 
-모든 퍼미션을 허용했는지 체크합니다.
-```
-for (int result : grandResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    check_result = false;
-                    break;
-                }
-            }
-```
-위치 값을 가져올 수 있음
 
-```
- if (check_result) {
-
-                //위치 값을 가져올 수 있음
-                ;
-            }
-```
-거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다. 2가지 경우가 있음
-
-```
- else {
-                
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])
-                        || ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1])) {
-
-                    Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 앱을 다시 실행하여 퍼미션을 허용해주세요.", Toast.LENGTH_LONG).show();
-                    finish();
-
-
-                } else {
-
-                    Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 설정(앱 정보)에서 퍼미션을 허용해야 합니다. ", Toast.LENGTH_LONG).show();
-
-                }
-            }
-```
 
 ```
 public void onRequestPermissionsResult(int permsRequestCode,
@@ -363,11 +354,11 @@ public void onRequestPermissionsResult(int permsRequestCode,
 
         if ( permsRequestCode == PERMISSIONS_REQUEST_CODE && grandResults.length == REQUIRED_PERMISSIONS.length) {
 
-
+             // 요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면
             boolean check_result = true;
 
 
-
+            // 모든 퍼미션을 허용했는지 체크합니다. 
             for (int result : grandResults) {
                 if (result != PackageManager.PERMISSION_GRANTED) {
                     check_result = false;
@@ -380,8 +371,9 @@ public void onRequestPermissionsResult(int permsRequestCode,
 
 
             }
+            
             else {
-
+        // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])
                         || ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1])) {
 
@@ -397,6 +389,8 @@ public void onRequestPermissionsResult(int permsRequestCode,
             }
 
         }
+```
+
 ```
 코드가 정상적이면 퍼미션이 허용된게 확인되며 앱이 정상적으로 실행됩니다.
 
