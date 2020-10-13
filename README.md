@@ -230,8 +230,219 @@ checkLocationServicesStatus() 메소드
       @NonNull int[] grandResults: 해당 권한에 대한 부여 결과
       
    3. 반환값
+      요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면 모든 퍼미션을 허용했는지 체크하고 함수 종료
+      거부한 퍼미션이 있으면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료
    
+   4. 의존함수
+      ActivityCompat,shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0]||                                  
+      ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1]
+      
+      거부한 퍼미션이 하나라도 있을 경우 true를 반환
+   5. 소스코드
+       ```
+       public void onRequestPermissionsResult(int permsRequestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grandResults) {
+
+        if ( permsRequestCode == PERMISSIONS_REQUEST_CODE && grandResults.length == REQUIRED_PERMISSIONS.length) {
+
+             // 요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면
+            boolean check_result = true;
+
+
+            // 모든 퍼미션을 허용했는지 체크합니다. 
+            for (int result : grandResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    check_result = false;
+                    break;
+                }
+            }
+
+
+            if ( check_result ) {
+
+
+            }
+            
+            else {
+        // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])
+                        || ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1])) {
+
+                    Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 앱을 다시 실행하여 퍼미션을 허용해주세요.", Toast.LENGTH_LONG).show();
+                    finish();
+
+
+                }else {
+
+                    Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 설정(앱 정보)에서 퍼미션을 허용해야 합니다. ", Toast.LENGTH_LONG).show();
+
+                }
+            }
+
+        }
+       
+       ```
+ 
+
+GpsTracker클래스
+====
+
+GpsTracker메소드
+===
+
+```
+public GpsTracker(Context context) {
+    this.mContext = context;
+    getLocation();
+}
+```
+context 변수를 파라미터로 받고 getLocation메소드 호출
+
+getLocation메소드
+====
+
+ 1. 간단한 설명
+     startActivityForResult메소드에서 수신한 객체랑 Gps코드를 switch문으로 확인하고 if문으로
+     지정된 공급자가 활성화 되어있는지 확인되면 checkRunTimePermission메소드를 호출한다.
+     
+  2. 매개변수
+    getSystemService의 매개변수 LOCATION_SERVICE: 위치 업데이트를 제어하는 역할을 함
+    isProviderEnabled의 매개변수 LocationManager.GPS_PROVIDER: 위성을 사용하여 위치를 결정하는 공급자
+    isProviderEnabled의 매개변수 LocationManager.NETWORK_PROVIDER: 기지국 및 WiFi 액세스 포인트 근처를 기반으로 위치를 결정하는 공급자.
+    ContextCompat.checkSelfPermission메소드의 매개변수: MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION
+                                               액티비티와,위치 정보 엑세스권한을 파라미터로 받음
+    requestLocationUpdates의 매개변수:LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this
+    지정된 인수를 사용하여 지정된 공급자의 위치 업데이트를 등록합니다.
+    getLastKnownLocation의 매개변수:LocationManager.NETWORK_PROVIDER  제공된 공급자로부터 마지막으로 알려진 위치를 가져 옵니다.
+                                               
+  3. 반환값
+     받은 제공자를 기준으로 위도랑 경도를 반환합니다.
+     
+  4. 의존함수
+     getSystemService메소드 :getSystemService()메서드를 사용하여 성공적으로 객체를 생성하게 된다면 대부분 Mannager라는
+                                        접미어가 붙은 관리 매니저 객체를 반환한다 매개변수 LOCATION_SERVICE를 파라미터로 받았으므로
+                                        위치서비스 관리 매니저 객체반환
+                                        
+     isProviderEnabled메소드:공급자가 허용되어있는지 확인한다. 
+     ContextCompat.checkSelfPermission메소드:이 메서드를 통해 특정권한이 이미 획득됐는지 확인합니다.
+     requestLocationUpdates메소드:지정된 인수를 사용하여 지정된 공급자의 위치 업데이트를 등록합니다. 
+     getLastKnownLocation 메소드: 제공된 공급자로부터 마지막으로 알려진 위치를 가져옵니다.
+     getLatitude():latitude변수 리턴
+     getLongitude():longitude변수 리턴
+     
+  5. 소스코드
    
+   ````
+   private final Context mContext;
+Location location;
+double latitude;
+double longitude;
+
+private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+protected LocationManager locationManager;
+
+
+public GpsTracker(Context context) {
+    this.mContext = context;
+    getLocation();
+}
+
+
+public Location getLocation() {
+    try {
+        locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if (!isGPSEnabled && !isNetworkEnabled) {
+
+        } else {
+
+            int hasFineLocationPermission = ContextCompat.checkSelfPermission(mContext,
+                    Manifest.permission.ACCESS_FINE_LOCATION);
+            int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(mContext,
+                    Manifest.permission.ACCESS_COARSE_LOCATION);
+
+
+            if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
+                    hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+
+
+            } else
+                return null;
+
+
+            if (isNetworkEnabled) {
+
+
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                if (locationManager != null)
+                {
+                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    if (location != null)
+                    {
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
+                    }
+                }
+            }
+
+
+            if (isGPSEnabled)
+            {
+                if (location == null)
+                {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    if (locationManager != null)
+                    {
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        if (location != null)
+                        {
+                            latitude = location.getLatitude();
+                            longitude = location.getLongitude();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    catch (Exception e)
+    {
+        Log.d("@@@", ""+e.toString());
+    }
+
+    return location;
+}
+
+public double getLatitude()
+{
+    if(location != null)
+    {
+        latitude = location.getLatitude();
+    }
+
+    return latitude;
+}
+
+public double getLongitude()
+{
+    if(location != null)
+    {
+        longitude = location.getLongitude();
+    }
+
+    return longitude;
+}
+   ````
+   
+   마지막으로 getCurrentAddress(latitude,longitude);
+   위도랑 경도를 파라미터로 받아 주소를 리턴합니다
+   Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+   위도랑 경도가 나오고 어플 
       
       
     
