@@ -1,9 +1,9 @@
 checkLocationServicesStatus() 메소드
 =======
 1. 간단한 설명: locationManager 인스턴스에 getSystemService()메소드를 이용해 위치서비스를 집어 넣습니다.
-            함수가 종료되기전에 return값으로 locationManager.isProviderEnabled()메소드를 사용해 
-            (GPS : LocationManager.GPS_PROVIDER /전화기지국 : LocationManager.NETWORK_PROVIDER) 
-            GPS 프로바이더 사용가능여부 true,네트워크 프로바이더 사용가능여부 true 을 리턴해줍니다
+    함수가 종료되기전에 return값으로 locationManager.isProviderEnabled()메소드를 사용해 
+    (GPS : LocationManager.GPS_PROVIDER /전화기지국 : LocationManager.NETWORK_PROVIDER) 
+     GPS 프로바이더 사용가능여부 true,네트워크 프로바이더 사용가능여부 true 을 리턴해줍니다
             
 2 . 매개변수(의존함수 들의 매개변수 밖에 없음)
     getSystemService의 매개변수 LOCATION_SERVICE: 위치 업데이트를 제어하는 역할을 함
@@ -302,7 +302,7 @@ context 변수를 파라미터로 받고 getLocation메소드 호출
 getLocation메소드
 ====
 
- 1. 간단한 설명
+   1. 간단한 설명
      startActivityForResult메소드에서 수신한 객체랑 Gps코드를 switch문으로 확인하고 if문으로
      지정된 공급자가 활성화 되어있는지 확인되면 checkRunTimePermission메소드를 호출한다.
      
