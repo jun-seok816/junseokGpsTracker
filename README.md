@@ -1,24 +1,23 @@
-checkLocationServicesStatus() 메소드
-=======
-1. 간단한 설명: locationManager 인스턴스에 getSystemService()메소드를 이용해 위치서비스를 집어 넣습니다.
-    함수가 종료되기전에 return값으로 locationManager.isProviderEnabled()메소드를 사용해 
-    (GPS : LocationManager.GPS_PROVIDER /전화기지국 : LocationManager.NETWORK_PROVIDER) 
-     GPS 프로바이더 사용가능여부 true,네트워크 프로바이더 사용가능여부 true 을 리턴해줍니다
+# checkLocationServicesStatus() 메소드
+
+## description 
+
+지정된 공급자의 현재 활성화/비활성화 상태를 반환합니다.
             
-2 . 매개변수(의존함수 들의 매개변수 밖에 없음)
-    getSystemService의 매개변수 LOCATION_SERVICE: 위치 업데이트를 제어하는 역할을 함
-    isProviderEnabled의 매개변수 LocationManager.GPS_PROVIDER: 위성을 사용하여 위치를 결정하는 공급자
-    isProviderEnabled의 매개변수 LocationManager.NETWORK_PROVIDER: 기지국 및 WiFi 액세스 포인트 근처를 기반으로 위치를 결정하는 공급자.
+## parameter
+
+없음
     
-3 . 반환값    
-    isProviderEnabled()을 사용하여 지정된 공급자의 현재 활성화 / 비활성화 상태를 반환합니다. 
+## return value   
+
+isProviderEnabled()을 사용하여 지정된 공급자의 현재 활성화 / 비활성화 상태를 반환합니다. 
     
-4. 의존함수 
-    getSystemService(): getSystemService()메서드를 사용하여 성공적으로 객체를 생성하게 된다면 대부분 Mannager라는
-                                        접미어가 붙은 관리 매니저 객체를 반환한다 
-    isProviderEnabled():지정된 공급자의 활성화/비활성화 상태를 반환합니다.                                        
+## Dependence function
+getSystemService(): 주어진 파라미터에 대응되는 안드로이드가 제공하는 시스템 서비스를 요청한다. >https://promobile.tistory.com/169
+
+isProviderEnabled():지정된 공급자의 활성화/비활성화 상태를 반환합니다.                                        
     
-5. 소스코드    
+## Source code    
     
     ```
      public boolean checkLocationServicesStatus() {
