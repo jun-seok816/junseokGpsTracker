@@ -1,5 +1,6 @@
 # checkLocationServicesStatus() 메소드
 
+
 ## description 
 
 지정된 공급자의 현재 활성화/비활성화 상태를 반환합니다.
@@ -28,420 +29,415 @@ isProviderEnabled():지정된 공급자의 활성화/비활성화 상태를 반�
     }
     ```
     
- showDialogForLocationServiceSetting메소드
-    =====
+
+# showDialogForLocationServiceSetting메소드
     
-    1. 간단한 설명
+## description 
+
+이 메소드는 사용자에게 대화박스를 이용하여 위치서비스를 요구합니다.
+            
+## parameter
+
+없음
     
-        이 메소드는 사용자에게 대화박스를 이요하여 위치서비스를 요구합니다, 사용자가 허용을 누르면 
-        startActivityForResult()메소드에 인텐트 객체랑 GPS코드를 파라미터로 넘깁니다.
-                  
-    2. 매개변수
+## return value   
+
+사용자에게 대화박스를 띄워줍니다 
     
-       setPositiveButton의 매개변수:CharSequence text(버튼의 텍스트를 보여주기 위한 문자열),
-                                   DialogInterface.OnClickListener listener(버튼의 클릭을 처리하는 리스너)
-        
-       setNegativeButton의 매개변수: setPositiveButton과 동일
-       
-       Intent의 매개변수: ACTION_LOCATION_SOURCE_SETTINGS(현재 위치 소스 구성을 허용하는 설정을 표시합니다)
-       
-       startActivityForResult의 매개변수: Intent 객체 ,변수 GPS_ENABLE_REQUEST_CODE
+## Dependence function
 
+setTitle: 대화상자의 제목
+
+setMessage: 대화상자의 메세지
+
+setCancelable: 사용자가 대화상자를 없앨 수 있는지에 대한 여부 설정
+
+setPositiveButton: 대화상자의 허용버튼을 눌렀을때 일어나는 함수 onClick메소드를 오버라이드 한다
+setPositiveButton: 대화상자의 취소버튼을 눌렀을때 일어나는 함수 onClick메소드를 오버라이드 한다
+
+startActivityForResult: onActivityResult메소드와 콜백에서 액티비티의 결과를 별도의 Intent객체로 수신하는 함수
+                        >https://developer.android.com/training/basics/intents/result?hl=ko
     
-    3. 반환값
-       이 메소드는 사용자에게 대화박스를 띄워주게되는 내장 메소드 입니다 포지티브버튼을 누르면 
-       startActivityForResult()를 호출합니다. 액티비티는 해당 결과를 onActivityResult() 에게
-       콜백에서 별도의 Intent 객체로 수신합니다
-       네거티브버튼을 누르면 대화박스가 꺼집니다.
-       
-    4. 의존함수
-        setTitle: 대화상자의 제목
-        setMessage: 대화상자의 메세지
-        setCancelable: 사용자가 대화상자를 없앨 수 있는지에 대한 여부 설정
-        setPositiveButton: 대화상자의 허용버튼을 눌렀을때 일어나는 함수 onClick메소드를 오버라이드 한다
-        setPositiveButton: 대화상자의 취소버튼을 눌렀을때 일어나는 함수 onClick메소드를 오버라이드 한다
-        startActivityForResult:onActivityResult메소드와 콜백에서 액티비티의 결과를 별도의 Intent객체로 수신하는 함수
-        
-    5. 소스코드        
-        ```
-        private void showDialogForLocationServiceSetting() {
+## Source code
+```
+    private void showDialogForLocationServiceSetting() {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("위치 서비스 비활성화");
-        builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n"
-                + "위치 설정을 수정하실래요?");
-        builder.setCancelable(true);
-        builder.setPositiveButton("설정", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                Intent callGPSSettingIntent
-                        = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivityForResult(callGPSSettingIntent, GPS_ENABLE_REQUEST_CODE);
-            }
-        });
-        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-        builder.create().show();
-    }
-        ```
-  OnActivityResult메소드
-  =====
-  
-  1. 간단한 설명
-     startActivityForResult메소드에서 수신한 객체랑 Gps코드를 switch문으로 확인하고 if문으로
-     지정된 공급자가 활성화 되어있는지 확인되면 checkRunTimePermission메소드를 호출한다.
-     
-  2. 매개변수
-     onActivityResult메소드의 매개변수 :requestCode는 대화상자 액티비티랑 MainActivity를 구별하기위해 사용
-                                       resultCode는 어떠한 결과코드를 주었는지에 대한 변수
-                                       Intent data는 액티비티에서 보낸 결과 데이터가 들어가있는 부분
-  3. 반환값
-     결과적으로 코드에 문제가 없다면 "GPS 활성화 되있음"이라는 로그를 남기고
-     checkRunTimePermission메소드를 호출한다
-     
-  4. 의존함수
-     checkRunTimePermission메소드
-     
-  5. 소스코드
-     
-     ```
-      @Override
-        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-
-            case GPS_ENABLE_REQUEST_CODE:
-
-
-                if (checkLocationServicesStatus()) {
-                    if (checkLocationServicesStatus()) {
-
-                        Log.d("@@@", "onActivityResult : GPS 활성화 되있음");
-                        checkRunTimePermission();
-                        return;
-                    }
-                }
-
-                break;
+    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+    builder.setTitle("위치 서비스 비활성화");
+    builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n"
+            + "위치 설정을 수정하실래요?");
+    builder.setCancelable(true);
+    builder.setPositiveButton("설정", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int id) {
+            Intent callGPSSettingIntent
+                    = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivityForResult(callGPSSettingIntent, GPS_ENABLE_REQUEST_CODE);
         }
-    }
-     ```
-     
-   checkRunTimePermission메소드
-   ====
-   1. 간단한 설명
-      위치 퍼미션을 가지고 있는지 체크합니다 , 이미 퍼미션을 가지고 있다면 위치 값을 가져올 수 있지만
-      퍼미션을 허용한적이 없다면 퍼미션 요청을 합니다.
-   
-   2. 매개변수
-      ContextCompat.checkSelfPermission메소드의 매개변수: MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION
-                                               액티비티와,위치 정보 엑세스권한을 파라미터로 받음
-                                                     
-      shouldShowRequestPermissionRationale메소드의 매개변수:                          
-      MainActivity.this,
-      shouldShowRequestPermissionRationale(MainActivity.this, REQUIRED_PERMISSIONS[0]) 위치정보 엑세스 권한을확인하고 
-      거부를 한적이 있는 경우에는 true를 반환합니다.
-      REQUIRED_PERMISSIONS[0]=Manifest.permission.ACCESS_FINE_LOCATION
-      
-      requestPermissions의 매개변수: MainActivity.this, 
-      REQUIRED_PERMISSIONS=Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
-      PERMISSIONS_REQUEST_CODE=2001;
-      
-   3. 반환값
-      이미 퍼미션을 가지고 있다면 허용된 걸로 인식하고 종료,
-      
-      퍼미션 요청이 허용되지 않았으면 퍼미션 요청이 필요합니다
-      1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는 Toast문으로 퍼미션이 필요한 이유설명
-         requestPermissions메소드로 퍼미션을 요청합니다.
-      2. 사용자가 퍼미션 거부를 한 적이 없는 경우에는 퍼미션 요청을 바로 합니다.
-         requestPermissions메소드로 퍼미션 요청
-   
-   4. 의존함수
-      ContextCompat.CheckSelfPermission: 이 메서드를 통해 특정권한이 이미 획득됐는지 확인합니다.
-                                         메서드에서 PERMISSION_DENIED를 반환하면 shouldShowRequestPermissionRationale()을 호출합니다.
-      
-      shouldShowRequestPermissionRationale: 이 메서드는 사용자가 권한 요청 팝업에서 수락을 누르지 않으면 자동으로 반환값이 true가 됩니다.
-     
-      requestPermissions메소드는: 요청코드를 포함하여 사용자에게 퍼미션을 요청합니다 권한 요청을 만날때 새 process팝업이 뜨며 
-      사용자가 이를 수락하면 역시 권한 사용 기능을 수행할 수 있게 됩니다. 이 메소드의 요청 결과는 onRequestPermissionResult에서 
-      수신됩니다.
-      
-   5. 수신코드
+    });
+    builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int id) {
+            dialog.cancel();
+        }
+    });
+    builder.create().show();
+}
+```
+# OnActivityResult메소드
+
+
+## description 
+
+startActivityForResult메소드에서 수신한 객체랑 Gps코드를 확인하고 지정된 공급자가 활성화 되어있는지 확인되면
+checkRunTimePermission메소드를 호출한다.
+            
+## parameter
+
+requestCode: 대화상자 액티비티랑 MainActivity를 구별하기 위한 코드
+
+resultCode: 어떠한 결과코드를 주었는지에 대한 변수
+
+Intent data: 액티비티에서 보낸 결과 데이터가 들어가있는 부분
+
+>https://medium.com/@henen/%EB%B9%A0%EB%A5%B4%EA%B2%8C-%EB%B0%B0%EC%9A%B0%EB%8A%94-%EC%95%88%EB%93%9C%EB%A1%9C%EC%9D%B4%EB%93%9C-intent-3-%EC%97%91%ED%8B%B0%EB%B9%84%ED%8B%B0%EA%B0%84%EC%9D%98-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%A0%84%EC%86%A1-2-50e7456226fc
+
     
-    ```
+## return value   
+
+log.d
+
+checkRunTimePermission();
+    
+## Dependence function
+
+checkRunTimePermission메소드
+
+## Source code
+
+```
+ @Override
+   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+   super.onActivityResult(requestCode, resultCode, data);
+
+   switch (requestCode) {
+
+       case GPS_ENABLE_REQUEST_CODE:
+
+
+           if (checkLocationServicesStatus()) {
+               if (checkLocationServicesStatus()) {
+
+                   Log.d("@@@", "onActivityResult : GPS 활성화 되있음");
+                   checkRunTimePermission();
+                   return;
+               }
+           }
+
+           break;
+   }
+```
+     
+# checkRunTimePermission메소드
+
+## description 
+
+위치 퍼미션을 가지고 있는지 체크합니다.
+            
+## parameter
+
+없음
+    
+## return value   
+
+퍼미션을 가지고 있다면 허용된 걸로 인식하고 종료,
+퍼미션이 허용되지 않았다면 퍼미션 요청
+    
+## Dependence function
+
+ContextCompat.CheckSelfPermission: 이 메서드를 통해 특정권한이 이미 획득됐는지 확인합니다.  
+                                    권한이 없으면 shouldShowRequestPermissionRationale을 호출합니다
+
+shouldShowRequestPermissionRationale: 이 메서드는 사용자가 권한 요청 팝업에서 수락을 누르지 않으면 자동으로 반환값이 true가 됩니다.
+
+requestPermissions: 사용자에게 퍼미션을 요청합니다, 이 메소드의 요청 결과는 onRequestPermissionResult에서 수신됩니다.
+
+>https://developer.android.com/training/permissions/requesting?hl=en
+    
+## Source code    
+    
+ ```
     void checkRunTimePermission() {
 
-        //런타임 퍼미션 처리
-        // 1. 위치 퍼미션을 가지고 있는지 체크합니다.
-        int hasFineLocationPermission = ContextCompat.checkSelfPermission(MainActivity.this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
-        int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(MainActivity.this,
-                Manifest.permission.ACCESS_COARSE_LOCATION);
+    //런타임 퍼미션 처리
+    // 1. 위치 퍼미션을 가지고 있는지 체크합니다.
+    int hasFineLocationPermission = ContextCompat.checkSelfPermission(MainActivity.this,
+            Manifest.permission.ACCESS_FINE_LOCATION);
+    int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(MainActivity.this,
+            Manifest.permission.ACCESS_COARSE_LOCATION);
 
 
-        if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
-                hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+    if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
+            hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
 
-            // 2. 이미 퍼미션을 가지고 있다면
-            // ( 안드로이드 6.0 이하 버전은 런타임 퍼미션이 필요없기 때문에 이미 허용된 걸로 인식합니다.)
-
-
-            // 3.  위치 값을 가져올 수 있음
+        // 2. 이미 퍼미션을 가지고 있다면
+        // ( 안드로이드 6.0 이하 버전은 런타임 퍼미션이 필요없기 때문에 이미 허용된 걸로 인식합니다.)
 
 
-        } else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
-
-            // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
-            if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,shouldShowRequestPermissionRationale(MainActivity.this, REQUIRED_PERMISSIONS[0]))) {
-
-                // 3-2. 요청을 진행하기 전에 사용자가에게 퍼미션이 필요한 이유를 설명해줄 필요가 있습니다.
-                Toast.makeText(MainActivity.this, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.", Toast.LENGTH_LONG).show();
-                // 3-3. 사용자게에 퍼미션 요청을 합니다. 요청 결과는 onRequestPermissionResult에서 수신됩니다.
-                ActivityCompat.requestPermissions(MainActivity.this, REQUIRED_PERMISSIONS,
-                        PERMISSIONS_REQUEST_CODE);
+        // 3.  위치 값을 가져올 수 있음
 
 
-            } else {
-                // 4-1. 사용자가 퍼미션 거부를 한 적이 없는 경우에는 퍼미션 요청을 바로 합니다.
-                // 요청 결과는 onRequestPermissionResult에서 수신됩니다.
-                ActivityCompat.requestPermissions(MainActivity.this, REQUIRED_PERMISSIONS,
-                        PERMISSIONS_REQUEST_CODE);
-            }
+    } else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
 
-        }
-    }
-    ```
-   onRequestPermissionResult
-   ====
-   
-   1. 간단한 설명
-      권한 요청 결과에 대한 콜백메소드
-   
-   2. 매개변수
-     onRequestPermissionsResult메소드:
-      int permsRequestCode : 전달된 요청 코드
-      @NonNull String[] permissions: 요청 된 권한
-      @NonNull int[] grandResults: 해당 권한에 대한 부여 결과
-      
-   3. 반환값
-      요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면 모든 퍼미션을 허용했는지 체크하고 함수 종료
-      거부한 퍼미션이 있으면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료
-   
-   4. 의존함수
-      ActivityCompat,shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0]||                                  
-      ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1]
-      
-      거부한 퍼미션이 하나라도 있을 경우 true를 반환
-   5. 소스코드
-       ```
-       public void onRequestPermissionsResult(int permsRequestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grandResults) {
+        // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
+        if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,shouldShowRequestPermissionRationale(MainActivity.this, REQUIRED_PERMISSIONS[0]))) {
 
-        if ( permsRequestCode == PERMISSIONS_REQUEST_CODE && grandResults.length == REQUIRED_PERMISSIONS.length) {
+            // 3-2. 요청을 진행하기 전에 사용자가에게 퍼미션이 필요한 이유를 설명해줄 필요가 있습니다.
+            Toast.makeText(MainActivity.this, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.", Toast.LENGTH_LONG).show();
+            // 3-3. 사용자게에 퍼미션 요청을 합니다. 요청 결과는 onRequestPermissionResult에서 수신됩니다.
+            ActivityCompat.requestPermissions(MainActivity.this, REQUIRED_PERMISSIONS,
+                    PERMISSIONS_REQUEST_CODE);
 
-             // 요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면
-            boolean check_result = true;
-
-
-            // 모든 퍼미션을 허용했는지 체크합니다. 
-            for (int result : grandResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    check_result = false;
-                    break;
-                }
-            }
-
-
-            if ( check_result ) {
-
-
-            }
-            
-            else {
-        // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])
-                        || ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1])) {
-
-                    Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 앱을 다시 실행하여 퍼미션을 허용해주세요.", Toast.LENGTH_LONG).show();
-                    finish();
-
-
-                }else {
-
-                    Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 설정(앱 정보)에서 퍼미션을 허용해야 합니다. ", Toast.LENGTH_LONG).show();
-
-                }
-            }
-
-        }
-       
-       ```
- 
-
-GpsTracker클래스
-====
-
-GpsTracker메소드
-===
-
-```
-public GpsTracker(Context context) {
-    this.mContext = context;
-    getLocation();
-}
-```
-context 변수를 파라미터로 받고 getLocation메소드 호출
-
-getLocation메소드
-====
-
-   1. 간단한 설명
-     startActivityForResult메소드에서 수신한 객체랑 Gps코드를 switch문으로 확인하고 if문으로
-     지정된 공급자가 활성화 되어있는지 확인되면 checkRunTimePermission메소드를 호출한다.
-     
-  2. 매개변수
-    getSystemService의 매개변수 LOCATION_SERVICE: 위치 업데이트를 제어하는 역할을 함
-    isProviderEnabled의 매개변수 LocationManager.GPS_PROVIDER: 위성을 사용하여 위치를 결정하는 공급자
-    isProviderEnabled의 매개변수 LocationManager.NETWORK_PROVIDER: 기지국 및 WiFi 액세스 포인트 근처를 기반으로 위치를 결정하는 공급자.
-    ContextCompat.checkSelfPermission메소드의 매개변수: MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION
-                                               액티비티와,위치 정보 엑세스권한을 파라미터로 받음
-    requestLocationUpdates의 매개변수:LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this
-    지정된 인수를 사용하여 지정된 공급자의 위치 업데이트를 등록합니다.
-    getLastKnownLocation의 매개변수:LocationManager.NETWORK_PROVIDER  제공된 공급자로부터 마지막으로 알려진 위치를 가져 옵니다.
-                                               
-  3. 반환값
-     받은 제공자를 기준으로 위도랑 경도를 반환합니다.
-     
-  4. 의존함수
-     getSystemService메소드 :getSystemService()메서드를 사용하여 성공적으로 객체를 생성하게 된다면 대부분 Mannager라는
-                                        접미어가 붙은 관리 매니저 객체를 반환한다 매개변수 LOCATION_SERVICE를 파라미터로 받았으므로
-                                        위치서비스 관리 매니저 객체반환
-                                        
-     isProviderEnabled메소드:공급자가 허용되어있는지 확인한다. 
-     ContextCompat.checkSelfPermission메소드:이 메서드를 통해 특정권한이 이미 획득됐는지 확인합니다.
-     requestLocationUpdates메소드:지정된 인수를 사용하여 지정된 공급자의 위치 업데이트를 등록합니다. 
-     getLastKnownLocation 메소드: 제공된 공급자로부터 마지막으로 알려진 위치를 가져옵니다.
-     getLatitude():latitude변수 리턴
-     getLongitude():longitude변수 리턴
-     
-  5. 소스코드
-   
-   ````
-   private final Context mContext;
-Location location;
-double latitude;
-double longitude;
-
-private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
-private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
-protected LocationManager locationManager;
-
-
-public GpsTracker(Context context) {
-    this.mContext = context;
-    getLocation();
-}
-
-
-public Location getLocation() {
-    try {
-        locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
-
-        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        if (!isGPSEnabled && !isNetworkEnabled) {
 
         } else {
-
-            int hasFineLocationPermission = ContextCompat.checkSelfPermission(mContext,
-                    Manifest.permission.ACCESS_FINE_LOCATION);
-            int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(mContext,
-                    Manifest.permission.ACCESS_COARSE_LOCATION);
-
-
-            if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
-                    hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
-
-
-            } else
-                return null;
-
-
-            if (isNetworkEnabled) {
-
-
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
-                if (locationManager != null)
-                {
-                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    if (location != null)
-                    {
-                        latitude = location.getLatitude();
-                        longitude = location.getLongitude();
-                    }
-                }
-            }
-
-
-            if (isGPSEnabled)
-            {
-                if (location == null)
-                {
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                    if (locationManager != null)
-                    {
-                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        if (location != null)
-                        {
-                            latitude = location.getLatitude();
-                            longitude = location.getLongitude();
-                        }
-                    }
-                }
-            }
+            // 4-1. 사용자가 퍼미션 거부를 한 적이 없는 경우에는 퍼미션 요청을 바로 합니다.
+            // 요청 결과는 onRequestPermissionResult에서 수신됩니다.
+            ActivityCompat.requestPermissions(MainActivity.this, REQUIRED_PERMISSIONS,
+                    PERMISSIONS_REQUEST_CODE);
         }
-    }
-    catch (Exception e)
-    {
-        Log.d("@@@", ""+e.toString());
-    }
 
-    return location;
+    }
 }
 
-public double getLatitude()
-{
-    if(location != null)
-    {
-        latitude = location.getLatitude();
-    }
+```
+# onRequestPermissionResult
 
-    return latitude;
+## description 
+
+requestPermissions메소드의 권한 요청 결과에 대한 콜백메소드
+            
+## parameter
+
+int permsRequestCode : 전달된 요청 코드
+
+@NonNull String[] permissions: 요청 된 권한
+
+@NonNull int[] grandResults: 해당 권한에 대한 부여 결과
+>https://m.blog.naver.com/PostView.nhn?blogId=wnwogh88&logNo=220548983598&proxyReferer=https:%2F%2Fwww.google.com%2F
+
+## return value   
+
+퍼미션을 허용했는지 체크, 만약 거부한 퍼미션이 있으면 앱을 사용할 수 없는 이유를 설명해줌
+    
+## Dependence function
+
+shouldShowRequestPermissionRationale: 권한 요청을 한 번 거절하면 메서드 반환 값이 true가 됩니다.
+>https://academy.realm.io/kr/posts/android-marshmellow-permission/
+    
+## Source code
+
+```
+public void onRequestPermissionsResult(int permsRequestCode,
+                                    @NonNull String[] permissions,
+                                    @NonNull int[] grandResults) {
+
+ if ( permsRequestCode == PERMISSIONS_REQUEST_CODE && grandResults.length == REQUIRED_PERMISSIONS.length) {
+
+      // 요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면
+     boolean check_result = true;
+
+
+     // 모든 퍼미션을 허용했는지 체크합니다. 
+     for (int result : grandResults) {
+         if (result != PackageManager.PERMISSION_GRANTED) {
+             check_result = false;
+             break;
+         }
+     }
+
+
+     if ( check_result ) {
+
+
+     }
+     
+     else {
+ // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다
+         if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])
+                 || ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1])) {
+
+             Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 앱을 다시 실행하여 퍼미션을 허용해주세요.", Toast.LENGTH_LONG).show();
+             finish();
+
+
+         }else {
+
+             Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 설정(앱 정보)에서 퍼미션을 허용해야 합니다. ", Toast.LENGTH_LONG).show();
+
+         }
+     }
+
+ }
+
+```
+ 
+
+
+# GpsTracker메소드
+
+## description 
+
+context 변수를 파라미터로 받고 getLocation메소드 호출
+            
+## parameter
+
+context: 액티비티 정보를 얻어오는 변수
+>https://zxcv5500.tistory.com/258
+
+## return value   
+
+변수mContext 초기화
+getLocation메소드 호출
+    
+## Dependence function
+
+getLocation메소드 호출
+    
+## Source code
+
+```
+public GpsTracker(Context context) {
+    this.mContext = context;
+    getLocation();
 }
+```
 
-public double getLongitude()
-{
-    if(location != null)
-    {
-        longitude = location.getLongitude();
-    }
+# getLocation메소드
 
-    return longitude;
-}
-   ````
-   
-   마지막으로 getCurrentAddress(latitude,longitude);
-   위도랑 경도를 파라미터로 받아 주소를 리턴합니다
-   Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
-   위도랑 경도가 나오고 어플 
+## description 
+
+위도랑 경도를 리턴하는 메소드
+            
+## parameter
+
+없음
+
+## return value   
+
+받은 제공자를 기준으로 위도랑 경도를 반환합니다.
+    
+## Dependence function
+
+getSystemService(): 주어진 파라미터에 대응되는 안드로이드가 제공하는 시스템 서비스를 요청한다. >https://promobile.tistory.com/169
+
+isProviderEnabled():공급자가 허용되어있는지 확인한다. 
+    
+## Source code
+
+```
+public Location getLocation() {
+ try {
+     locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+
+     boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+     boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+     if (!isGPSEnabled && !isNetworkEnabled) {
+
+     } else {
+
+         int hasFineLocationPermission = ContextCompat.checkSelfPermission(mContext,
+                 Manifest.permission.ACCESS_FINE_LOCATION);
+         int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(mContext,
+                 Manifest.permission.ACCESS_COARSE_LOCATION);
+
+
+         if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
+                 hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+
+
+         } else
+             return null;
+
+
+         if (isNetworkEnabled) {
+
+
+             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+             if (locationManager != null)
+             {
+                 location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                 if (location != null)
+                 {
+                     latitude = location.getLatitude();
+                     longitude = location.getLongitude();
+                 }
+             }
+         }
+
+
+         if (isGPSEnabled)
+         {
+             if (location == null)
+             {
+                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                 if (locationManager != null)
+                 {
+                     location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                     if (location != null)
+                     {
+                         latitude = location.getLatitude();
+                         longitude = location.getLongitude();
+                     }
+                 }
+             }
+         }
+     }
+ }
+```
+
+# onCreat메소드의 추가 설명
+
+## description 
+
+버튼을 누르면
+화면에 위치정보를 띄움
+            
+    
+## Dependence function
+
+setOnClickListener(): 변수ShowLocationButton 으로 지정한 버튼이 클릭되면 함수 실행
+
+gpsTracker.getLatitude(): 얻어온 위도를 변수에 초기화
+gpsTracker.getLongitude():얻어온 경도를 변수에 초기화
+
+getCurrentAddress(): 위도랑 경도를 파라미터로 받아 주소 리턴
+
+    
+## Source code
+```
+Button ShowLocationButton = (Button) findViewById(R.id.button);
+        ShowLocationButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View arg0)
+            {
+
+                gpsTracker = new GpsTracker(MainActivity.this);
+
+                double latitude = gpsTracker.getLatitude();
+                double longitude = gpsTracker.getLongitude();
+
+                String address = getCurrentAddress(latitude, longitude);
+                textview_address.setText(address);
+
+                Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+            }
+        });
+```
+
+
       
       
     
