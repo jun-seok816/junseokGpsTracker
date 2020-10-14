@@ -9,9 +9,12 @@
 
 없음
     
-## return value   
+## return value
 
-isProviderEnabled()을 사용하여 지정된 공급자의 현재 활성화 / 비활성화 상태를 반환합니다. 
+type: boolean
+
+value: isProviderEnabled()을 사용하여 지정된 공급자의 현재 활성화 / 비활성화 상태를 반환합니다. 
+
     
 ## Dependence function
 getSystemService(): 주어진 파라미터에 대응되는 안드로이드가 제공하는 시스템 서비스를 요청한다. >https://promobile.tistory.com/169
@@ -42,7 +45,9 @@ isProviderEnabled():지정된 공급자의 활성화/비활성화 상태를 반�
     
 ## return value   
 
-사용자에게 대화박스를 띄워줍니다 
+type: void
+
+value:사용자에게 대화박스를 띄워줍니다 
     
 ## Dependence function
 
@@ -103,11 +108,13 @@ Intent data: 액티비티에서 보낸 결과 데이터가 들어가있는 부�
 >https://medium.com/@henen/%EB%B9%A0%EB%A5%B4%EA%B2%8C-%EB%B0%B0%EC%9A%B0%EB%8A%94-%EC%95%88%EB%93%9C%EB%A1%9C%EC%9D%B4%EB%93%9C-intent-3-%EC%97%91%ED%8B%B0%EB%B9%84%ED%8B%B0%EA%B0%84%EC%9D%98-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%A0%84%EC%86%A1-2-50e7456226fc
 
     
-## return value   
+## return value
 
-log.d
+type: void
 
-checkRunTimePermission();
+value:log.d
+
+checkRunTimePermission()호출
     
 ## Dependence function
 
@@ -148,10 +155,12 @@ checkRunTimePermission메소드
 
 없음
     
-## return value   
+## return value
 
-퍼미션을 가지고 있다면 허용된 걸로 인식하고 종료,
-퍼미션이 허용되지 않았다면 퍼미션 요청
+type: void
+
+value: 퍼미션을 가지고 있다면 허용된 걸로 인식하고 종료,
+       퍼미션이 허용되지 않았다면 퍼미션 요청
     
 ## Dependence function
 
@@ -225,9 +234,11 @@ int permsRequestCode : 전달된 요청 코드
 @NonNull int[] grandResults: 해당 권한에 대한 부여 결과
 >https://m.blog.naver.com/PostView.nhn?blogId=wnwogh88&logNo=220548983598&proxyReferer=https:%2F%2Fwww.google.com%2F
 
-## return value   
+## return value 
 
-퍼미션을 허용했는지 체크, 만약 거부한 퍼미션이 있으면 앱을 사용할 수 없는 이유를 설명해줌
+type: void
+
+value: 퍼미션을 허용했는지 체크, 만약 거부한 퍼미션이 있으면 앱을 사용할 수 없는 이유를 설명해줌
     
 ## Dependence function
 
@@ -294,10 +305,12 @@ context 변수를 파라미터로 받고 getLocation메소드 호출
 context: 액티비티 정보를 얻어오는 변수
 >https://zxcv5500.tistory.com/258
 
-## return value   
+## return value 
 
-변수mContext 초기화
-getLocation메소드 호출
+type: void
+
+value: 변수mContext 초기화
+       getLocation메소드 호출
     
 ## Dependence function
 
@@ -322,9 +335,11 @@ public GpsTracker(Context context) {
 
 없음
 
-## return value   
+## return value
 
-받은 제공자를 기준으로 위도랑 경도를 반환합니다.
+type: Location
+
+value: 받은 제공자를 기준으로 위도랑 경도를 반환합니다.
     
 ## Dependence function
 
