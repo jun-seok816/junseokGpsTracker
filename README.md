@@ -13,7 +13,7 @@
 
 type: boolean
 
-value: isProviderEnabled()을 사용하여 지정된 공급자의 현재 활성화 / 비활성화 상태를 반환합니다. 
+value: isProviderEnabled()을 사용하여 지정된 공급자의 현재 활성화인경우 true를 반환, 비활성화 상태일 경우 false를 
 
     
 ## Dependence function
