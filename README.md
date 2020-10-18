@@ -244,7 +244,8 @@
 
 ## description 
 
- - requestPermissions메소드의 권한 요청 결과에 대한 콜백메소드
+ - requestPermissions메소드의 콜백메소드
+   - https://developer.android.com/reference/androidx/core/app/ActivityCompat.OnRequestPermissionsResultCallback?hl=ko#onRequestPermissionsResult(int,%20java.lang.String[],%20int[])
             
 ## parameter
 
