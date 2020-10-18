@@ -19,10 +19,12 @@
 
     
 ## Dependence function
-- getSystemService(): 주어진 파라미터에 대응되는 안드로이드가 제공하는 시스템 서비스를 요청한다. 
+- getSystemService()
+  - 주어진 파라미터에 대응되는 안드로이드가 제공하는 시스템 서비스를 요청한다. 
   - https://developer.android.com/reference/android/content/Context#getSystemService(java.lang.String)
 
-- locationManager.isProviderEnabled():지정된 Provider의 Enabled/Disabled 상태를 Return합니다. 
+- locationManager.isProviderEnabled()
+  - 지정된 Provider의 Enabled/Disabled 상태를 Return합니다. 
   - https://developer.android.com/reference/android/location/LocationManager#isProviderEnabled(java.lang.String)
     
 ## Source code    
