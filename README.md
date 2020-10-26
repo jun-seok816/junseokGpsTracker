@@ -5,7 +5,7 @@
 
 - LocationManager 의 GPS_PRIVIDER 또는 NETWORK_PROVIDER 가 동작 중인지 확인하여 결과 값을 리턴한다.
 
-- LocationManager는 getSystemSerivce()를 이용하여 얻는다.
+- LocationManager 개체 getSystemSerivce()를 이용하여 얻는다.
             
 ## parameter
 
