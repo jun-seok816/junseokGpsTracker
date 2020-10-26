@@ -55,7 +55,7 @@
 
 - type: void
 
-- value:사용자에게 대화박스를 띄워줍니다 
+- value:없음 
     
 ## Dependence function
 
@@ -123,7 +123,7 @@
 
 - type: void
 
-- value:없음
+- value: 없음
 
     
 ## Dependence function
@@ -328,7 +328,9 @@ public void onRequestPermissionsResult(int permsRequestCode,
 
 ## description 
 
- - getLocation메소드 
+ - getLocation메소드 호출
+ 
+ - mContext변수 초기화
             
 ## parameter
 
@@ -447,6 +449,82 @@ public Location getLocation() {
          }
      }
  }
+```
+
+# getLatitude메소드
+
+## description 
+
+- 위도 변수 초기화
+- MainActivity에서 불러올 함수
+            
+## parameter
+
+- 없음
+
+## return value
+
+- type
+  - double
+
+- value
+  - 위도 변수 리턴
+    
+## Dependence function
+
+- location.getLatitude()
+  - 기기의 위도를 리턴
+
+## Source code
+
+```
+public double getLatitude()
+    {
+        if(location != null)
+        {
+            latitude = location.getLatitude();
+        }
+
+        return latitude;
+    }
+```
+
+# getLatitude메소드
+
+## description 
+
+- 경도 변수 초기화
+- MainActivity에서 불러올 함수
+            
+## parameter
+
+- 없음
+
+## return value
+
+- type
+  - double
+
+- value
+  - 경도 변수 리턴
+    
+## Dependence function
+
+- location.getLongitude()
+  - 기기의 경도를 리턴
+
+## Source code
+
+```
+public double getLongitude()
+    {
+        if(location != null)
+        {
+            longitude = location.getLongitude();
+        }
+
+        return longitude;
+    }
 ```
 
 # onCreate메소드의 추가 설명
