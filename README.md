@@ -1,5 +1,6 @@
-<div><img width="2000" src ="https://user-images.githubusercontent.com/72478198/97280397-908cec80-187f-11eb-8287-7913af1bfeae.PNG"></div>
 <div><img width="2000" src ="https://user-images.githubusercontent.com/72478198/97280399-91be1980-187f-11eb-9fb4-d99c10457884.PNG"></div>
+<div><img width="2000" src ="https://user-images.githubusercontent.com/72478198/97280397-908cec80-187f-11eb-8287-7913af1bfeae.PNG"></div>
+
 
 # checkLocationServicesStatus() 메소드
 
